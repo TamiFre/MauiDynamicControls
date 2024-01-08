@@ -1,7 +1,11 @@
-﻿namespace MauiDynamicControls;
+﻿using static Android.Graphics.ImageDecoder;
+using MauiApp2;
+
+namespace MauiDynamicControls;
 
 public partial class DynamicControlsPage : ContentPage
 {
+    List<Monkey> monkeys;
     int countup = 0;
     int countdown = 0;
     public DynamicControlsPage()
@@ -9,7 +13,8 @@ public partial class DynamicControlsPage : ContentPage
 		InitializeComponent();
         //הוספת הפקדים בצורה דינאמית
 		InitializeControlls();
-	}
+        monkeys = Monkey.GetMonkeys();
+    }
 
     private void InitializeControlls()
     {
@@ -43,25 +48,32 @@ public partial class DynamicControlsPage : ContentPage
         this.Content = stackLayout;
       
     }
-    private void AddLabels()
+    private Image AddImage()
     {
         //יצירת הפקד
-        Label lbl = new Label()
+        //Label lbl = new Label()
+        //{
+        //    HorizontalOptions = LayoutOptions.Center,
+        //    Text = "התחלה",
+        //    FontSize = 12
+
+
+        //};
+        //StackLayout stk = (StackLayout)this.Content;
+        //stk.Children.Add(lbl);
+        ////OnPlatform....=>DeviceInfo.Current.Platform=DevicePlatform....
+        // DevicePlatform OnPlatform = DeviceInfo.Current.Platform;
+        //if (OnPlatform == DevicePlatform.Android || OnPlatform == DevicePlatform.iOS)
+        //    lbl.FontSize = 15;
+        //else
+        //    lbl.FontSize = 25;
+
+        Image img = new Image()
         {
-            HorizontalOptions = LayoutOptions.Center,
-            Text = "התחלה",
-            FontSize = 12
-
-
+             Source = "https://raw.githubusercontent.com/jamesmontemagno/app-monkeys/master/baboon.jpg"
         };
         StackLayout stk = (StackLayout)this.Content;
-        stk.Children.Add(lbl);
-        //OnPlatform....=>DeviceInfo.Current.Platform=DevicePlatform....
-         DevicePlatform OnPlatform = DeviceInfo.Current.Platform;
-        if (OnPlatform == DevicePlatform.Android || OnPlatform == DevicePlatform.iOS)
-            lbl.FontSize = 15;
-        else
-            lbl.FontSize = 25;
+        return img;
       
        //הוספת הפקד למסך
        //הערה: ניתן להגדיר שהפעולה הנוכחית מחזירה את הפקד החדש שנוצר 
@@ -113,13 +125,8 @@ public partial class DynamicControlsPage : ContentPage
         };
         //הרשמה לאירוע
         //הרשמה לאירוע באמצעות anoymous functions =>
-        downBtn.Clicked += (s, e) =>
-        {
-            countdown++;
-            StackLayout stk = (StackLayout)this.Content;
-            Label lbl_txt = stk.Children.FirstOrDefault(x => x is Label) as Label;
-            lbl_txt.Text = $"  פעמים {countdown} לחצתי למטה";
-        };
+        downBtn.Clicked += ClickedDownEvent;
+
 
         //חיבור הפקדים לLAYOUT
         stk.Children.Insert(0,upBtn);
@@ -128,9 +135,36 @@ public partial class DynamicControlsPage : ContentPage
 
     private void ClickedUpEvent(object sender, EventArgs e)
     {
+        Button bt = (Button)sender;
         countup++;
-        StackLayout stk= (StackLayout)this.Content;
-        Label lbl_txt = stk.Children.FirstOrDefault(x=>x is Label) as Label;
-        lbl_txt.Text = $"  פעמים {countup} לחצתי למעלה";
+        if (countup >= monkeys.Count())
+        {
+            btn_changeDirectionPicDown.IsEnabled = true;
+            bt.IsEnabled = false;
+        }
+        else
+        {
+            AddImage().Source = monkeys[countdown].Image;
+            btn_changeDirectionPicDown.IsEnabled = true;
+        }
+
+
+    }
+
+    private void ClickedDownEvent(object sender, EventArgs e)
+    {
+        Button bt = (Button)sender;
+        countdown--;
+        if (countdown <= 1)
+        {
+            bt.IsEnabled = false;
+            AddImage().Source = monkeys[countdown].Image;
+        }
+        else
+        {
+            AddImage().Source = monkeys[countdown].Image;
+            downBtn.IsEnabled = true;
+        }
+
     }
 }
