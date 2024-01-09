@@ -1,29 +1,31 @@
-﻿using static Android.Graphics.ImageDecoder;
+﻿using Kotlin.Text;
 using MauiApp2;
+using Microsoft.Maui.Controls.PlatformConfiguration;
 
 namespace MauiDynamicControls;
 
 public partial class DynamicControlsPage : ContentPage
 {
     List<Monkey> monkeys;
-    int countup = 0;
-    int countdown = 0;
+    //int countup = 0;
+    //int countdown = 0;
+    int counter = 0;
     public DynamicControlsPage()
-	{
-		InitializeComponent();
+    {
+        InitializeComponent();
         //הוספת הפקדים בצורה דינאמית
-		InitializeControlls();
+        InitializeControlls();
         monkeys = Monkey.GetMonkeys();
     }
 
     private void InitializeControlls()
     {
-		//Add your Code Here
-      
-		AddLayout();  //הוסף פריסה
-        
-        AddLabels();//הוסף את תווית
-       
+        //Add your Code Here
+
+        AddLayout();  //הוסף פריסה
+
+        AddImage();//הוסף את תווית
+
         AddButtons(); //הוסף כפתורים
 
 
@@ -37,7 +39,7 @@ public partial class DynamicControlsPage : ContentPage
         //לאורך או לרוחב
         stackLayout.Orientation = StackOrientation.Vertical;
         //רווח
-        stackLayout.Padding = new Thickness(30, 0) ;
+        stackLayout.Padding = new Thickness(30, 0);
         //המרחק בין הפקדים בתוך הפריסה
         stackLayout.Spacing = 25;
         stackLayout.BackgroundColor = Colors.Brown;
@@ -46,7 +48,7 @@ public partial class DynamicControlsPage : ContentPage
         stackLayout.VerticalOptions = LayoutOptions.Center;
         //הצבת הפקד בתוך המסך
         this.Content = stackLayout;
-      
+
     }
     private Image AddImage()
     {
@@ -70,24 +72,25 @@ public partial class DynamicControlsPage : ContentPage
 
         Image img = new Image()
         {
-             Source = "https://raw.githubusercontent.com/jamesmontemagno/app-monkeys/master/baboon.jpg"
+            Source = "https://raw.githubusercontent.com/jamesmontemagno/app-monkeys/master/baboon.jpg"//התמונה של הזה במקום הראשון
         };
         StackLayout stk = (StackLayout)this.Content;
+        stk.Children.Add(img);
         return img;
-      
-       //הוספת הפקד למסך
-       //הערה: ניתן להגדיר שהפעולה הנוכחית מחזירה את הפקד החדש שנוצר 
-       //ונגדיר פעולה נוספת המקבלת רשימת פקדים ומוסיפה אותם לפריסה
-       
-     
-       
+
+        //הוספת הפקד למסך
+        //הערה: ניתן להגדיר שהפעולה הנוכחית מחזירה את הפקד החדש שנוצר 
+        //ונגדיר פעולה נוספת המקבלת רשימת פקדים ומוסיפה אותם לפריסה
+
+
+
     }
 
     //כפתורים
     private void AddButtons()
     {
         //נאתר את הפריסה
-        StackLayout stk=(StackLayout)this.Content;
+        StackLayout stk = (StackLayout)this.Content;
         //ניצור כפתור 1==="\uef7d"
         Button upBtn = new Button()
         {
@@ -129,42 +132,105 @@ public partial class DynamicControlsPage : ContentPage
 
 
         //חיבור הפקדים לLAYOUT
-        stk.Children.Insert(0,upBtn);
+        stk.Children.Insert(0, upBtn);
         stk.Children.Add(downBtn);
     }
 
     private void ClickedUpEvent(object sender, EventArgs e)
     {
-        Button bt = (Button)sender;
-        countup++;
-        if (countup >= monkeys.Count())
+        counter++;
+        StackLayout stk = new StackLayout();
+        if (counter >= monkeys.Count())
         {
-            btn_changeDirectionPicDown.IsEnabled = true;
-            bt.IsEnabled = false;
+            //deactivate the up button
+            ((Button)stk.Children[0]).IsEnabled = false;
+            counter--;
         }
-        else
-        {
-            AddImage().Source = monkeys[countdown].Image;
-            btn_changeDirectionPicDown.IsEnabled = true;
-        }
+        ((Image)stk.Children[1]).Source = monkeys[counter].Image;
+        // reactivate the down button
+        ((Button)stk.Children[2]).IsEnabled = true;
 
 
     }
 
     private void ClickedDownEvent(object sender, EventArgs e)
     {
-        Button bt = (Button)sender;
-        countdown--;
-        if (countdown <= 1)
+        StackLayout stk = new StackLayout();
+        counter--;
+        if (counter < 1)
         {
-            bt.IsEnabled = false;
-            AddImage().Source = monkeys[countdown].Image;
+            // deactivate the down button
+            ((Button)stk.Children[2]).IsEnabled = false;
+            counter++;
         }
-        else
-        {
-            AddImage().Source = monkeys[countdown].Image;
-            downBtn.IsEnabled = true;
-        }
-
+        ((Image)stk.Children[1]).Source = monkeys[counter].Image;
+        ((Button)stk.Children[0]).IsEnabled = true;
+        // reactivate the up button
     }
+
+
+    //private void ClickedUpEvent(object sender, EventArgs e)
+    //{
+    //    Button bt = (Button)sender; //הכפתור שעשה את הפעולה
+    //    countup++;
+    //    if (countup >= monkeys.Count())//אם אין יותק תמונות
+    //    {
+    //        bt.IsEnabled = false;
+    //        AddImage().Source =monkeys[countup].Image;
+    //    }
+    //    else 
+    //    {
+    //        bt.IsEnabled = true;
+    //    }
+    //}
+
+    //private void ClickedDownEvent(object sender, EventArgs e)
+    //{
+    //    Button bt = (Button)sender;
+    //    countdown--;
+    //    if (countdown <= 1)
+    //    {
+    //        bt.IsEnabled = false;
+    //        AddImage().Source = monkeys[countdown].Image;
+    //    }
+    //    else 
+    //    {
+    //        bt.IsEnabled = true;
+    //    }
+    //}
+
+    //private void ClickedUpEvent(object sender, EventArgs e)
+    //{
+    //    Button bt = (Button)sender;
+    //    countup++;
+    //    if (countup >= monkeys.Count())
+    //    {
+    //        downBtn.IsEnabled = true;
+    //        bt.IsEnabled = false;
+    //    }
+    //    else
+    //    {
+    //        AddImage().Source = monkeys[countup].Image;
+    //        downBtn.IsEnabled = true;
+    //    }
+
+
+    //}
+
+    //private void ClickedDownEvent(object sender, EventArgs e)
+    //{
+    //    Button bt = (Button)sender;
+    //    countdown--;
+    //    if (countdown <= 1)
+    //    {
+    //        bt.IsEnabled = false;
+    //        AddImage().Source = monkeys[countdown].Image;
+    //    }
+    //    else
+    //    {
+    //        AddImage().Source = monkeys[countdown].Image;
+    //        downBtn.IsEnabled = true;
+    //    }
+
+    //}
 }
